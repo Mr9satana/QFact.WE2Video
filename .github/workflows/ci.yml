@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore complete source tree
+        shell: powershell
+        run: ./prepare_sources.ps1
+
+      - name: Build embedded UI bundle
+        shell: powershell
+        run: ./prepare_ui.ps1
+
+      - name: Build
+        shell: powershell
+        run: dotnet build src/QFact.WE2Video/QFact.WE2Video.csproj -c Release -r win-x64
