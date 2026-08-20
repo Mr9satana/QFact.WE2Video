@@ -27,6 +27,21 @@ jobs:
         shell: powershell
         run: ./prepare_ui.ps1
 
-      - name: Build
+      - name: Publish test build
         shell: powershell
-        run: dotnet build src/QFact.WE2Video/QFact.WE2Video.csproj -c Release -r win-x64
+        run: dotnet publish src/QFact.WE2Video/QFact.WE2Video.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=embedded -o test-build/win-x64
+
+      - name: SHA-256
+        shell: powershell
+        run: |
+          $h=(Get-FileHash -Algorithm SHA256 test-build/win-x64/QFact.WE2Video.exe).Hash.ToLower()
+          Set-Content -Encoding ASCII test-build/SHA256SUMS.txt "$h  QFact.WE2Video.exe"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: QFact.WE2Video-test-win-x64
+          path: |
+            test-build/win-x64/QFact.WE2Video.exe
+            test-build/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 7
