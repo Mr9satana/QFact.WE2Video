@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   windows-release:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'release: publish v1.0.3')
     runs-on: windows-latest
 
     steps:
