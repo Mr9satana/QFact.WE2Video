@@ -78,18 +78,9 @@ internal static class WindowFinder
 
     public static IntPtr GetForegroundWindowHandle() => GetForegroundWindow();
 
-    /// <summary>
-    /// Installs a short-lived accessibility event hook before Wallpaper Engine creates its pop-out.
-    /// This lets us move the window off-screen and mark it NOACTIVATE as soon as Windows reports it,
-    /// which avoids the visible flash/focus steal that can happen if we wait until after creation.
-    /// </summary>
     public static IDisposable CreateBackgroundWindowGuard(string expectedTitle, int width, int height, IntPtr previousForeground)
         => new BackgroundWindowGuard(expectedTitle, width, height, previousForeground);
 
-    /// <summary>
-    /// Keeps the Wallpaper Engine pop-out renderable and capturable while removing it from the normal desktop flow.
-    /// It stays visible to DWM/WGC, but is off-screen, absent from the taskbar, bottom-most and non-activating.
-    /// </summary>
     public static void ConfigureBackgroundCaptureWindow(IntPtr hwnd, int width, int height, IntPtr previousForeground)
     {
         if (hwnd == IntPtr.Zero) return;
@@ -101,7 +92,14 @@ internal static class WindowFinder
             SetWindowLongPtr(hwnd, GwlExStyle, new IntPtr(exStyle));
 
             ShowWindow(hwnd, SwShowNoActivate);
-            SetWindowPos(hwnd, HwndBottom, -32000, -32000, Math.Max(64, width), Math.Max(64, height),
+
+            // Keep a tiny sliver on the virtual desktop. Completely off-screen accelerated windows
+            // can stop producing DWM frames on some GPU/driver combinations and WGC then records black.
+            var desktop = System.Windows.Forms.SystemInformation.VirtualScreen;
+            const int visibleSliver = 64;
+            var x = Math.Max(desktop.Left, desktop.Right - visibleSliver);
+            var y = Math.Max(desktop.Top, desktop.Bottom - visibleSliver);
+            SetWindowPos(hwnd, HwndBottom, x, y, Math.Max(64, width), Math.Max(64, height),
                 SwpNoActivate | SwpNoOwnerZOrder | SwpFrameChanged | SwpShowWindow);
 
             if (GetForegroundWindow() == hwnd && previousForeground != IntPtr.Zero && previousForeground != hwnd)
@@ -110,6 +108,57 @@ internal static class WindowFinder
         catch (Exception ex)
         {
             AppLogger.Warn("Background window configuration failed: " + ex.Message);
+        }
+    }
+
+    public static void ConfigureCompatibilityCaptureWindow(IntPtr hwnd, int width, int height, IntPtr previousForeground)
+    {
+        if (hwnd == IntPtr.Zero) return;
+        try
+        {
+            var exStyle = GetWindowLongPtr(hwnd, GwlExStyle).ToInt64();
+            exStyle |= WsExToolWindow | WsExNoActivate;
+            exStyle &= ~WsExAppWindow;
+            SetWindowLongPtr(hwnd, GwlExStyle, new IntPtr(exStyle));
+
+            var desktop = System.Windows.Forms.SystemInformation.VirtualScreen;
+            var x = desktop.Left + 8;
+            var y = desktop.Top + 8;
+            ShowWindow(hwnd, SwShowNoActivate);
+            SetWindowPos(hwnd, HwndBottom, x, y, Math.Max(64, width), Math.Max(64, height),
+                SwpNoActivate | SwpNoOwnerZOrder | SwpFrameChanged | SwpShowWindow);
+
+            if (GetForegroundWindow() == hwnd && previousForeground != IntPtr.Zero && previousForeground != hwnd)
+                SetForegroundWindow(previousForeground);
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Warn("Compatibility window configuration failed: " + ex.Message);
+        }
+    }
+
+    public static void ConfigureVisibleCaptureFallback(IntPtr hwnd, int width, int height)
+    {
+        if (hwnd == IntPtr.Zero) return;
+        try
+        {
+            var exStyle = GetWindowLongPtr(hwnd, GwlExStyle).ToInt64();
+            exStyle &= ~WsExNoActivate;
+            exStyle &= ~WsExToolWindow;
+            exStyle |= WsExAppWindow;
+            SetWindowLongPtr(hwnd, GwlExStyle, new IntPtr(exStyle));
+
+            var desktop = System.Windows.Forms.SystemInformation.VirtualScreen;
+            var x = desktop.Left + Math.Max(0, Math.Min(80, desktop.Width - Math.Max(64, width)));
+            var y = desktop.Top + Math.Max(0, Math.Min(80, desktop.Height - Math.Max(64, height)));
+            ShowWindow(hwnd, SwRestore);
+            SetWindowPos(hwnd, IntPtr.Zero, x, y, Math.Max(64, width), Math.Max(64, height),
+                SwpNoOwnerZOrder | SwpFrameChanged | SwpShowWindow);
+            SetForegroundWindow(hwnd);
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Warn("Visible capture fallback configuration failed: " + ex.Message);
         }
     }
 
@@ -148,7 +197,7 @@ internal static class WindowFinder
     private static IntPtr GetWindowLongPtr(IntPtr hwnd, int index)
         => IntPtr.Size == 8 ? GetWindowLongPtr64(hwnd, index) : new IntPtr(GetWindowLong32(hwnd, index));
     private static IntPtr SetWindowLongPtr(IntPtr hwnd, int index, IntPtr value)
-        => IntPtr.Size == 8 ? SetWindowLongPtr64(hwnd, index, value) : new IntPtr(SetWindowLong32(hwnd, index, value.ToInt32()));
+        => IntPtr.Size == 8 ? SetWindowLongPtr64(hwnd, index) : new IntPtr(SetWindowLong32(hwnd, index, value.ToInt32()));
 
     private sealed class BackgroundWindowGuard : IDisposable
     {
