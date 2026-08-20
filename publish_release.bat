@@ -21,6 +21,9 @@ if errorlevel 1 (
 for /f "tokens=1" %%v in ('dotnet --version') do set "DOTNET_VERSION=%%v"
 echo .NET SDK: %DOTNET_VERSION%
 
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0prepare_sources.ps1"
+if errorlevel 1 goto :fail
+
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0prepare_ui.ps1"
 if errorlevel 1 goto :fail
 
