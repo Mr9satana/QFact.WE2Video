@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mr9satana.github.io/QFact.WE2Video/sitemap.xml
