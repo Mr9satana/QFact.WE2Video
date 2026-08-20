@@ -12,8 +12,8 @@ Donations are completely optional. The application never asks for or stores card
 
 Поддержка полностью добровольная. Приложение не запрашивает и не хранит данные банковских карт или платежей.
 
-You can also help for free by starring the repository, sharing it with Wallpaper Engine users, and reporting reproducible bugs.
+You can also help for free by starring the repository and reporting reproducible bugs.
 
-Также можно бесплатно помочь проекту: поставить репозиторию Star, рассказать о нём другим пользователям Wallpaper Engine и присылать воспроизводимые баги.
+Также можно бесплатно помочь проекту: поставить репозиторию Star и присылать воспроизводимые баги.
 
 — **Daewri · QFact**

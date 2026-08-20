@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+dist/
+release/
+.vs/
+*.user
+*.suo
+src/QFact.WE2Video/ui.bundle.zip

@@ -1,0 +1,56 @@
+name: Bug report
+about: Report a reproducible problem in QFact.WE2Video
+title: "[Bug] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting a reproducible problem.
+  - type: input
+    id: version
+    attributes:
+      label: QFact.WE2Video version
+      placeholder: v1.0.3
+    validations:
+      required: true
+  - type: dropdown
+    id: wallpaper_type
+    attributes:
+      label: Wallpaper type
+      options:
+        - Scene
+        - Web
+        - Video
+        - Unknown
+    validations:
+      required: true
+  - type: input
+    id: workshop
+    attributes:
+      label: Workshop ID
+      description: Leave blank for local wallpapers.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Select ...\n2. Enable ...\n3. Export ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log excerpt
+      description: Logs are stored under %LOCALAPPDATA%\QFact.WE2Video\logs\
+      render: text

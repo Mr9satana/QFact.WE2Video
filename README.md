@@ -1,87 +1,119 @@
-# QFact.WE2Video — Wallpaper Engine to Video / GIF Converter
+# Wallpaper Engine to Video / MP4 / GIF Converter — QFact.WE2Video
 
-**QFact.WE2Video** is a Windows **Wallpaper Engine converter** that exports installed Wallpaper Engine wallpapers to **MP4, WebM, MKV, MOV or GIF**. It supports **Scene, Video and Web wallpapers**, optional audio, background capture and manual Clean Export.
+**QFact.WE2Video** is a free Windows utility for exporting installed **Wallpaper Engine** wallpapers to **MP4, WebM, MKV, MOV or GIF**. It supports **Scene, Video and Web wallpapers**, optional audio, background capture and manual Clean Export.
 
-**RU:** QFact.WE2Video — конвертер Wallpaper Engine в видео и GIF для Windows. Он позволяет **сохранить обои Wallpaper Engine в MP4**, WebM, MKV, MOV или GIF и использовать результат вне Wallpaper Engine. Поддерживаются Scene, Video и Web-обои, звук, фоновый захват и ручной Clean Export.
+**RU:** QFact.WE2Video — конвертер **Wallpaper Engine в видео / MP4 / GIF** для Windows. Программа позволяет сохранить установленные обои Wallpaper Engine в обычный видеофайл и использовать результат вне Wallpaper Engine.
 
-> Looking for “Wallpaper Engine to video”, “Wallpaper Engine to MP4”, “Wallpaper Engine converter”, “how to export Wallpaper Engine wallpaper as video”, «конвертер Wallpaper Engine», «как сохранить обои Wallpaper Engine в видео» or «как сделать видео из обоев WE»? This is exactly what QFact.WE2Video is built for.
+[![Latest release](https://img.shields.io/github/v/release/Mr9satana/QFact.WE2Video?display_name=tag&sort=semver)](https://github.com/Mr9satana/QFact.WE2Video/releases/latest)
+[![Windows](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4)](#requirements)
+[![Release build](https://img.shields.io/github/actions/workflow/status/Mr9satana/QFact.WE2Video/release.yml?label=release)](https://github.com/Mr9satana/QFact.WE2Video/actions)
 
-## Features / Возможности
+## Download / Скачать
+
+**[Download the latest QFact.WE2Video.exe](https://github.com/Mr9satana/QFact.WE2Video/releases/latest)**
+
+No installer is required. The app is published as a self-contained `win-x64` executable. Wallpaper Engine and Microsoft Edge WebView2 Runtime are still required for the relevant features; FFmpeg/ffprobe must be available on PATH.
+
+## What it does / Что умеет
 
 - **Wallpaper Engine → video/GIF:** MP4/H.264, MP4/HEVC, WebM/VP9, MKV/H.264, MOV/H.264 and animated GIF.
-- **Scene / Web:** rendered through Wallpaper Engine and captured with Windows Graphics Capture, with fallback where available.
+- **Scene / Web wallpapers:** rendered through Wallpaper Engine and captured with Windows Graphics Capture.
 - **Video wallpapers:** converted directly from the source media instead of recording a black pop-out window.
 - **Audio on/off:** source audio for Video; per-process WASAPI loopback for Scene/Web.
-- **Background capture:** the dedicated Wallpaper Engine render window is kept outside the normal desktop flow so the user can keep working.
-- **Manual Clean Export:** lists root switches/modules exposed by the wallpaper and lets the user choose what to turn off for the capture.
+- **Background capture:** the dedicated Wallpaper Engine render window is kept outside the normal desktop flow so you can keep working.
+- **Manual Clean Export:** shows root switches/modules exposed by the wallpaper and lets you choose what should be disabled for the export.
 - **Resolution presets:** 720p, 1080p, QHD/2K, 4K, native and custom.
 - **Steam / Wallpaper Engine discovery:** automatic detection plus manual root-folder fallback.
-- **RU / EN:** full Russian and English UI, with language selection on first launch.
-- **Export notifications:** a Windows notification when the export succeeds or fails.
+- **RU / EN:** complete Russian and English UI, with language selection on first launch.
+- **Export notifications:** Windows notification when the export succeeds or fails.
 
-## Быстрый старт / Quick start
+## Quick start / Быстрый старт
 
-1. Download `QFact.WE2Video.exe` from the latest GitHub Release.
+1. Download `QFact.WE2Video.exe` from **Releases**.
 2. Launch it and choose Russian or English.
-3. Select a Wallpaper Engine wallpaper from the library.
+3. Select an installed Wallpaper Engine wallpaper from the library.
 4. Choose format, resolution, FPS, duration and audio.
-5. For Scene/Web wallpapers, optionally use manual Clean Export.
+5. For Scene/Web wallpapers, optionally configure **Clean Export**.
 6. Click **Export** and wait for the completion notification.
 
-## Typical use cases / Частые задачи
+## Common searches / Частые запросы
 
-- Convert a Wallpaper Engine Scene wallpaper to MP4.
-- Export a Wallpaper Engine Video wallpaper without screen recording.
-- Save a Wallpaper Engine wallpaper as GIF.
-- Turn a dual-monitor / ultrawide wallpaper into a normal video file.
-- Record Wallpaper Engine wallpaper with or without audio.
-- Export wallpaper while hiding optional clock, media-player or visualizer modules exposed by the author.
+QFact.WE2Video is built for tasks such as:
 
-## FAQ / Поиск по частым запросам
+- **Wallpaper Engine to video**
+- **Wallpaper Engine to MP4**
+- **Wallpaper Engine converter**
+- **export Wallpaper Engine wallpaper as video**
+- **convert Wallpaper Engine scene to MP4**
+- **save Wallpaper Engine wallpaper as GIF**
+- **конвертер Wallpaper Engine**
+- **как сохранить обои Wallpaper Engine в видео**
+- **как сделать видео из обоев WE**
+- **как конвертировать Wallpaper Engine в MP4**
+
+See the focused guide: **[Wallpaper Engine → video / MP4 / GIF](docs/wallpaper-engine-to-video.md)**.
+
+## FAQ
 
 ### Как сохранить обои Wallpaper Engine в видео?
-Выберите Scene, Web или Video-обои в QFact.WE2Video, задайте MP4 · H.264, разрешение, FPS и длительность, затем нажмите **Экспортировать**. Scene/Web будут отрендерены через Wallpaper Engine, а Video-конвертированы напрямую из исходного файла.
+Выберите Scene, Web или Video-обои в QFact.WE2Video, задайте `MP4 · H.264`, разрешение, FPS и длительность, затем нажмите **Экспортировать**. Scene/Web будут отрендерены через Wallpaper Engine, а Video-конвертированы напрямую из исходного файла.
 
 ### Как конвертировать Wallpaper Engine в MP4?
-QFact.WE2Video — Windows-конвертер **Wallpaper Engine → MP4**. Для максимальной совместимости используйте MP4 · H.264.
+Для максимальной совместимости выберите **MP4 · H.264**. QFact.WE2Video автоматически использует подходящий pipeline в зависимости от типа обоев.
 
 ### How do I export Wallpaper Engine wallpaper to video or MP4?
 Open QFact.WE2Video, select the installed wallpaper, choose MP4 · H.264 and the output settings, then click **Export**. Scene/Web wallpapers are rendered and captured; Video wallpapers are converted directly.
 
 ### Можно ли сделать GIF из Wallpaper Engine?
-Да. Выберите формат GIF. GIF не содержит звук, поэтому аудио для него отключается автоматически.
+Да. Выберите формат **GIF**. GIF не содержит звук, поэтому аудио отключается автоматически.
 
-### Нужна ли запись экрана?
-Нет. QFact.WE2Video использует отдельный pipeline: Windows Graphics Capture для Scene/Web и прямое FFmpeg-конвертирование для Video wallpapers.
+### Нужна ли обычная запись экрана?
+Нет. QFact.WE2Video uses Windows Graphics Capture for Scene/Web and direct FFmpeg conversion for Video wallpapers.
+
+### Меняет ли программа оригинальные обои?
+Нет. Оригинальные Workshop-файлы не изменяются. Clean Export применяет только доступные User Properties к отдельному окну захвата.
+
+## Clean Export
+
+Clean Export does **not** guess which elements are unwanted. It lists root boolean/on-off controls exposed by the wallpaper. If a root control owns dependent settings, it is shown as one module; child settings are hidden and compatible child switches are handled as a cascade.
+
+This only works for controls the wallpaper exposes through Wallpaper Engine User Properties. QFact.WE2Video does not patch arbitrary hard-coded layers inside `scene.pkg`.
 
 ## Requirements
 
 Runtime:
+
 - Windows 10 2004 (build 19041) or newer; Windows 11 recommended.
 - Wallpaper Engine for Scene/Web wallpapers.
-- FFmpeg/ffprobe available on PATH.
+- FFmpeg and ffprobe available on `PATH`.
 - Microsoft Edge WebView2 Runtime.
 
-Building from source additionally requires .NET 9 SDK.
+Building from source additionally requires **.NET 9 SDK**.
 
 ## Build from source
 
-1. Run `install_prereqs.bat` once if required.
-2. Run `publish_release.bat`.
-3. The self-contained Windows binary is created at `release\win-x64\QFact.WE2Video.exe`.
-4. SHA-256 is written to `release\SHA256SUMS.txt`.
+```text
+MAKE_EXE.bat
+```
 
-The .NET runtime, Web UI and managed/native app dependencies are packed into the published single-file EXE. FFmpeg, Wallpaper Engine and the WebView2 Runtime remain external runtime dependencies.
+or manually:
 
-## Clean Export
+```text
+prepare_ui.ps1
+publish_release.bat
+```
 
-Clean Export does **not** guess which elements are unwanted. It shows root boolean/on-off controls exposed by the wallpaper. If a root control owns dependent settings, it is shown as one module; child settings are hidden and compatible child switches are handled as a cascade.
+The release binary is written to:
 
-This only works for properties the wallpaper exposes through Wallpaper Engine User Properties. QFact.WE2Video does not patch arbitrary hard-coded layers inside `scene.pkg`.
+```text
+release\win-x64\QFact.WE2Video.exe
+```
 
 ## App data
 
-`%LOCALAPPDATA%\QFact.WE2Video\`
+```text
+%LOCALAPPDATA%\QFact.WE2Video\
+```
 
 - `settings.json` — language, manual Steam/WE path and export folder.
 - `logs\` — application logs.
@@ -93,12 +125,20 @@ Default exports: `%USERPROFILE%\Videos\QFact.WE2Video\Exports`.
 
 ## Support the project / Поддержать разработку
 
-If QFact.WE2Video saved you time, you can support development here: **[DaLink — daewri](https://dalink.to/daewri)**.
+QFact.WE2Video is free. If it saved you time, you can support development here:
 
-Если программа оказалась полезной, поддержать разработку можно здесь: **[DaLink — daewri](https://dalink.to/daewri)**.
+**[♥ DaLink — daewri](https://dalink.to/daewri)**
 
-The same support destination is used by the built-in Help/About section. See also **[SUPPORT.md](SUPPORT.md)**.
+Donations are optional. The application never asks for or stores card/payment details. You can also help by starring the repository or reporting reproducible bugs.
+
+See **[SUPPORT.md](SUPPORT.md)**.
+
+## Project status
+
+Current stable release: **v1.0.3**.
+
+Bug reports and reproducible compatibility issues are welcome through GitHub Issues.
 
 ## Third-party / Disclaimer
 
-See `THIRD_PARTY.md`. Wallpaper Engine is a separate commercial product and is **not** bundled with QFact.WE2Video. QFact.WE2Video is an independent project and is not affiliated with Wallpaper Engine or Valve.
+See **[THIRD_PARTY.md](THIRD_PARTY.md)**. Wallpaper Engine is a separate commercial product and is **not** bundled with QFact.WE2Video. QFact.WE2Video is an independent project and is not affiliated with Wallpaper Engine, Valve or Steam.

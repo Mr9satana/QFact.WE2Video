@@ -1,0 +1,54 @@
+name: release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  windows-release:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'release: publish v1.0.3')
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Build embedded UI bundle
+        shell: powershell
+        run: ./prepare_ui.ps1
+
+      - name: Publish QFact.WE2Video
+        shell: powershell
+        run: dotnet publish src/QFact.WE2Video/QFact.WE2Video.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=embedded -o release/win-x64
+
+      - name: SHA-256
+        shell: powershell
+        run: |
+          $h=(Get-FileHash -Algorithm SHA256 release/win-x64/QFact.WE2Video.exe).Hash.ToLower()
+          Set-Content -Encoding ASCII release/SHA256SUMS.txt "$h  QFact.WE2Video.exe"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: QFact.WE2Video-v1.0.3-win-x64
+          path: |
+            release/win-x64/QFact.WE2Video.exe
+            release/SHA256SUMS.txt
+
+      - name: Publish GitHub Release v1.0.3
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.3
+          target_commitish: main
+          name: QFact.WE2Video v1.0.3
+          body_path: RELEASE_NOTES.md
+          files: |
+            release/win-x64/QFact.WE2Video.exe
+            release/SHA256SUMS.txt
+          make_latest: true
