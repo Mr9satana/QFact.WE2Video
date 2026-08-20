@@ -33,13 +33,13 @@ internal sealed class CaptureService
 
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
 
-        // Video wallpapers are already media files. Capturing a Wallpaper Engine pop-out adds a render generation,
-        // can return black frames on some systems, and throws away the original audio stream. Transcode directly.
+        // Video wallpapers are real media files. Keep the direct path; GIF is internally converted through
+        // a finite temporary video so palette generation can never wait on an infinite stream.
         if (string.Equals(wallpaper.DisplayType, "video", StringComparison.OrdinalIgnoreCase))
         {
             var result = await ffmpeg.TranscodeVideoAsync(
                 wallpaper.LaunchPath, outputPath, width, height, fps, durationSeconds,
-                caps, profile, includeAudio && profile.SupportsAudio);
+                caps, profile, includeAudio && profile.SupportsAudio, cancellationToken);
 
             return new CaptureOutcome(
                 outputPath, result.Backend, profile.Id,
@@ -68,13 +68,21 @@ internal sealed class CaptureService
         Directory.CreateDirectory(tempDir);
 
         var audioWanted = includeAudio && profile.SupportsAudio;
-        var tempVideo = audioWanted
-            ? Path.Combine(tempDir, "video" + profile.Extension)
-            : outputPath;
+        var smartLoopEligible = FfmpegCapture.ShouldAnalyzeSmartLoop(durationSeconds);
+        var captureDuration = smartLoopEligible
+            ? FfmpegCapture.GetSmartLoopCaptureDuration(durationSeconds)
+            : durationSeconds;
+        var captureProfile = profile.IsGif
+            ? FfmpegCapture.ChooseFiniteIntermediateProfile(caps)
+            : profile;
+        var capturedVideo = Path.Combine(tempDir, "capture" + captureProfile.Extension);
+        var finalSilentVideo = Path.Combine(tempDir, "final" + profile.Extension);
         var tempWav = Path.Combine(tempDir, "wallpaper-audio.wav");
         WallpaperPropertiesApplyReport cleanReport = WallpaperPropertiesApplyReport.Empty;
         string? audioWarning = null;
         var audioIncluded = false;
+        var windowOpened = false;
+        var windowClosed = false;
 
         try
         {
@@ -85,22 +93,22 @@ internal sealed class CaptureService
 
             await we.OpenInWindowAsync(
                 wallpaper.LaunchPath, windowTitle, width, height, backgroundCapture, cancellationToken);
+            windowOpened = true;
             cancellationToken.ThrowIfCancellationRequested();
 
             var hwnd = await WindowFinder.WaitForWindowAsync(
-                windowTitle, TimeSpan.FromSeconds(20), activate: !backgroundCapture, cancellationToken);
+                windowTitle, TimeSpan.FromSeconds(20), activate: !backgroundCapture, cancellationToken: cancellationToken);
             if (hwnd == IntPtr.Zero)
                 throw new InvalidOperationException(AppI18n.T("weWindowTimeout"));
 
             if (backgroundCapture)
             {
-                // Keep the renderer alive and capturable, but remove it from the user's normal desktop flow.
                 WindowFinder.ConfigureBackgroundCaptureWindow(hwnd, width, height, previousForeground);
                 await Task.Delay(180, cancellationToken);
                 WindowFinder.ConfigureBackgroundCaptureWindow(hwnd, width, height, previousForeground);
             }
 
-            // Scene/Web assets need a moment to initialize before properties are changed or capture begins.
+            // Let Scene/Web assets settle before properties or the first Smart Loop reference frames are captured.
             await Task.Delay(1400, cancellationToken);
 
             if (selectedOverrides.Length > 0)
@@ -111,24 +119,62 @@ internal sealed class CaptureService
 
             async Task<CaptureResult> CaptureVideoAsync()
                 => await ffmpeg.CaptureAsync(
-                    hwnd, windowTitle, tempVideo, width, height, fps, durationSeconds,
-                    "auto", caps, profile);
+                    hwnd, windowTitle, capturedVideo, width, height, fps, captureDuration,
+                    "auto", caps, captureProfile, cancellationToken);
 
             CaptureResult captureResult;
             if (audioWanted)
             {
                 var pid = WindowFinder.GetProcessId(hwnd);
                 var audioResult = await _audioCapture.CaptureWhileAsync(
-                    pid, tempWav, durationSeconds, CaptureVideoAsync, cancellationToken);
+                    pid, tempWav, captureDuration, CaptureVideoAsync, cancellationToken);
                 captureResult = audioResult.OperationResult;
                 audioWarning = audioResult.Warning;
+            }
+            else
+            {
+                captureResult = await CaptureVideoAsync();
+                if (includeAudio && !profile.SupportsAudio)
+                    audioWarning = AppI18n.T("gifNoAudio");
+            }
 
-                if (audioResult.HasAudio && File.Exists(tempWav))
+            // Important: close the Wallpaper Engine pop-out immediately after the finite capture. GIF palette
+            // generation, Smart Loop analysis and muxing all run from local files and must not keep the window alive.
+            await we.CloseWindowAsync(windowTitle);
+            windowClosed = true;
+
+            var smartLoop = smartLoopEligible
+                ? await ffmpeg.AnalyzeSmartLoopAsync(
+                    capturedVideo, durationSeconds, captureDuration, cancellationToken)
+                : SmartLoopResult.NotAnalyzed(durationSeconds);
+            var finalDuration = smartLoop.DurationSeconds;
+
+            if (profile.IsGif)
+            {
+                await ffmpeg.TranscodeFiniteAsync(
+                    capturedVideo, outputPath, width, height, fps, finalDuration,
+                    caps, profile, includeAudio: false, cancellationToken: cancellationToken);
+            }
+            else
+            {
+                string silentVideo;
+                if (captureDuration > finalDuration + 0.01)
+                {
+                    await ffmpeg.TrimVideoAsync(
+                        capturedVideo, finalSilentVideo, finalDuration, profile, cancellationToken);
+                    silentVideo = finalSilentVideo;
+                }
+                else
+                {
+                    silentVideo = capturedVideo;
+                }
+
+                if (audioWanted && File.Exists(tempWav))
                 {
                     try
                     {
                         audioIncluded = await ffmpeg.MuxAudioAsync(
-                            tempVideo, tempWav, outputPath, durationSeconds, caps, profile);
+                            silentVideo, tempWav, outputPath, finalDuration, caps, profile, cancellationToken);
                     }
                     catch (Exception ex)
                     {
@@ -140,18 +186,13 @@ internal sealed class CaptureService
                 if (!audioIncluded)
                 {
                     if (File.Exists(outputPath)) File.Delete(outputPath);
-                    File.Move(tempVideo, outputPath, overwrite: true);
+                    File.Copy(silentVideo, outputPath, overwrite: true);
                 }
             }
-            else
-            {
-                captureResult = await CaptureVideoAsync();
-                if (includeAudio && !profile.SupportsAudio)
-                    audioWarning = AppI18n.T("gifNoAudio");
-            }
 
+            var backend = smartLoop.Applied ? captureResult.Backend + "+smart-loop" : captureResult.Backend;
             return new CaptureOutcome(
-                outputPath, captureResult.Backend, profile.Id,
+                outputPath, backend, profile.Id,
                 AudioRequested: includeAudio,
                 AudioIncluded: audioIncluded,
                 AudioWarning: audioWarning,
@@ -161,7 +202,8 @@ internal sealed class CaptureService
         }
         finally
         {
-            await we.CloseWindowAsync(windowTitle);
+            if (windowOpened && !windowClosed)
+                await we.CloseWindowAsync(windowTitle);
             try { Directory.Delete(tempDir, recursive: true); } catch { }
         }
     }
