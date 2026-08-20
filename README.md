@@ -76,9 +76,9 @@ Default exports: `%USERPROFILE%\Videos\QFact.WE2Video\Exports`.
 
 ## Support the project / Поддержать разработку
 
-If QFact.WE2Video saved you time, you can support the project here: **[SUPPORT.md](SUPPORT.md)**. The application itself opens this same page, so support methods can be updated later without rebuilding the EXE.
+If QFact.WE2Video saved you time, you can support the project here: https://dalink.to/daewri
 
-Если программа оказалась полезной, поддержать разработку можно здесь: **[SUPPORT.md](SUPPORT.md)**.
+Если программа оказалась полезной, поддержать разработку можно здесь: https://dalink.to/daewri
 
 ## Third-party / Disclaimer
 
