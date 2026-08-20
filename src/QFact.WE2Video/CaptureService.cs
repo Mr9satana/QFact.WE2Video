@@ -24,7 +24,13 @@ internal sealed class CaptureService
         var ffmpegPath = DependencyLocator.FindFfmpeg(null)
             ?? throw new FileNotFoundException(AppI18n.T("ffmpegNotFoundRun"));
         var ffmpeg = new FfmpegCapture(ffmpegPath);
+        var smartLoopProcessor = new SmartLoopProcessor(ffmpegPath);
+        var visualValidator = new CaptureVisualValidator(ffmpegPath);
         var caps = await ffmpeg.ProbeAsync();
+        var effectiveSmartLoop = SmartLoopProcessor.IsEligible(durationSeconds);
+        var captureDuration = effectiveSmartLoop
+            ? SmartLoopProcessor.GetCaptureDuration(durationSeconds)
+            : durationSeconds;
 
         if (!profile.IsSupported(caps))
             throw new InvalidOperationException(profile.MissingEncoderMessage + AppI18n.T("runDoctor"));
@@ -33,22 +39,42 @@ internal sealed class CaptureService
 
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
 
-        // Video wallpapers are already media files. Capturing a Wallpaper Engine pop-out adds a render generation,
-        // can return black frames on some systems, and throws away the original audio stream. Transcode directly.
+        // Video wallpapers are already media files. Capture a slightly longer working clip for Smart Loop,
+        // then trim to the best natural boundary near the requested duration.
         if (string.Equals(wallpaper.DisplayType, "video", StringComparison.OrdinalIgnoreCase))
         {
-            var result = await ffmpeg.TranscodeVideoAsync(
-                wallpaper.LaunchPath, outputPath, width, height, fps, durationSeconds,
-                caps, profile, includeAudio && profile.SupportsAudio);
+            var directTempDir = Path.Combine(Path.GetTempPath(), "QFact.WE2Video", Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(directTempDir);
+            var workingOutput = effectiveSmartLoop
+                ? Path.Combine(directTempDir, "smart-loop" + profile.Extension)
+                : outputPath;
+            try
+            {
+                var result = await ffmpeg.TranscodeVideoAsync(
+                    wallpaper.LaunchPath, workingOutput, width, height, fps, captureDuration,
+                    caps, profile, includeAudio && profile.SupportsAudio);
 
-            return new CaptureOutcome(
-                outputPath, result.Backend, profile.Id,
-                AudioRequested: includeAudio,
-                AudioIncluded: includeAudio && profile.SupportsAudio,
-                AudioWarning: profile.SupportsAudio ? null : AppI18n.T("gifNoAudio"),
-                BackgroundCapture: true,
-                CleanReport: WallpaperPropertiesApplyReport.Empty,
-                CleanDetectedCount: 0);
+                var directLoopResult = SmartLoopResult.Disabled(durationSeconds);
+                if (effectiveSmartLoop)
+                    directLoopResult = await smartLoopProcessor.AnalyzeAndTrimAsync(
+                        workingOutput, outputPath, durationSeconds, cancellationToken);
+
+                return new CaptureOutcome(
+                    outputPath, result.Backend, profile.Id,
+                    AudioRequested: includeAudio,
+                    AudioIncluded: includeAudio && profile.SupportsAudio,
+                    AudioWarning: profile.SupportsAudio ? null : AppI18n.T("gifNoAudio"),
+                    BackgroundCapture: true,
+                    BackgroundMode: "direct-video",
+                    BackgroundWarning: null,
+                    SmartLoop: directLoopResult,
+                    CleanReport: WallpaperPropertiesApplyReport.Empty,
+                    CleanDetectedCount: 0);
+            }
+            finally
+            {
+                try { Directory.Delete(directTempDir, recursive: true); } catch { }
+            }
         }
 
         if (!caps.HasGfxCapture && !caps.HasGdiGrab)
@@ -68,13 +94,17 @@ internal sealed class CaptureService
         Directory.CreateDirectory(tempDir);
 
         var audioWanted = includeAudio && profile.SupportsAudio;
-        var tempVideo = audioWanted
+        var tempVideo = (audioWanted || effectiveSmartLoop)
             ? Path.Combine(tempDir, "video" + profile.Extension)
             : outputPath;
         var tempWav = Path.Combine(tempDir, "wallpaper-audio.wav");
         WallpaperPropertiesApplyReport cleanReport = WallpaperPropertiesApplyReport.Empty;
         string? audioWarning = null;
         var audioIncluded = false;
+        var backgroundMode = backgroundCapture ? "safe" : "visible";
+        string? backgroundWarning = null;
+        var requestedBackend = "auto";
+        var loopResult = SmartLoopResult.Disabled(durationSeconds);
 
         try
         {
@@ -94,14 +124,16 @@ internal sealed class CaptureService
 
             if (backgroundCapture)
             {
-                // Keep the renderer alive and capturable, but remove it from the user's normal desktop flow.
                 WindowFinder.ConfigureBackgroundCaptureWindow(hwnd, width, height, previousForeground);
                 await Task.Delay(180, cancellationToken);
                 WindowFinder.ConfigureBackgroundCaptureWindow(hwnd, width, height, previousForeground);
             }
 
-            // Scene/Web assets need a moment to initialize before properties are changed or capture begins.
-            await Task.Delay(1400, cancellationToken);
+            // The event guard is only needed while the pop-out is being created. Disable it before
+            // compatibility/visible fallbacks so a later SHOW event cannot move the window back.
+            backgroundGuard?.Dispose();
+
+            await Task.Delay(1600, cancellationToken);
 
             if (selectedOverrides.Length > 0)
             {
@@ -109,26 +141,57 @@ internal sealed class CaptureService
                 await Task.Delay(450, cancellationToken);
             }
 
+            if (backgroundCapture)
+            {
+                var probe = await visualValidator.ProbeAsync(hwnd, windowTitle, fps, "auto", caps, cancellationToken);
+                if (!probe.Success || probe.IsLikelyBlack)
+                {
+                    AppLogger.Warn($"Background safe probe was black/invalid ({probe.Backend}: {probe.Details}). Trying compatibility placement.");
+                    WindowFinder.ConfigureCompatibilityCaptureWindow(hwnd, width, height, previousForeground);
+                    await Task.Delay(700, cancellationToken);
+                    probe = await visualValidator.ProbeAsync(hwnd, windowTitle, fps, "auto", caps, cancellationToken);
+                    backgroundMode = "compatibility";
+                }
+
+                if (!probe.Success || probe.IsLikelyBlack)
+                {
+                    AppLogger.Warn($"Background compatibility probe was black/invalid ({probe.Backend}: {probe.Details}). Falling back to visible capture.");
+                    WindowFinder.ConfigureVisibleCaptureFallback(hwnd, width, height);
+                    await Task.Delay(700, cancellationToken);
+                    probe = await visualValidator.ProbeAsync(hwnd, windowTitle, fps, "auto", caps, cancellationToken);
+                    backgroundMode = "visible-fallback";
+                    backgroundWarning = "Background capture was not renderable on this PC, so QFact.WE2Video switched to visible capture instead of exporting a black video.";
+                }
+
+                if (probe.Success && !probe.IsLikelyBlack)
+                    requestedBackend = probe.Backend;
+                else
+                    AppLogger.Warn($"Visual validation is still inconclusive ({probe.Backend}: {probe.Details}); FFmpeg auto fallback will be used.");
+            }
+
             async Task<CaptureResult> CaptureVideoAsync()
                 => await ffmpeg.CaptureAsync(
-                    hwnd, windowTitle, tempVideo, width, height, fps, durationSeconds,
-                    "auto", caps, profile);
+                    hwnd, windowTitle, tempVideo, width, height, fps, captureDuration,
+                    requestedBackend, caps, profile);
 
             CaptureResult captureResult;
             if (audioWanted)
             {
                 var pid = WindowFinder.GetProcessId(hwnd);
                 var audioResult = await _audioCapture.CaptureWhileAsync(
-                    pid, tempWav, durationSeconds, CaptureVideoAsync, cancellationToken);
+                    pid, tempWav, captureDuration, CaptureVideoAsync, cancellationToken);
                 captureResult = audioResult.OperationResult;
                 audioWarning = audioResult.Warning;
 
+                var muxedOutput = effectiveSmartLoop
+                    ? Path.Combine(tempDir, "muxed" + profile.Extension)
+                    : outputPath;
                 if (audioResult.HasAudio && File.Exists(tempWav))
                 {
                     try
                     {
                         audioIncluded = await ffmpeg.MuxAudioAsync(
-                            tempVideo, tempWav, outputPath, durationSeconds, caps, profile);
+                            tempVideo, tempWav, muxedOutput, captureDuration, caps, profile);
                     }
                     catch (Exception ex)
                     {
@@ -139,15 +202,23 @@ internal sealed class CaptureService
 
                 if (!audioIncluded)
                 {
-                    if (File.Exists(outputPath)) File.Delete(outputPath);
-                    File.Move(tempVideo, outputPath, overwrite: true);
+                    if (File.Exists(muxedOutput)) File.Delete(muxedOutput);
+                    File.Move(tempVideo, muxedOutput, overwrite: true);
                 }
+
+                if (effectiveSmartLoop)
+                    loopResult = await smartLoopProcessor.AnalyzeAndTrimAsync(
+                        muxedOutput, outputPath, durationSeconds, cancellationToken);
             }
             else
             {
                 captureResult = await CaptureVideoAsync();
                 if (includeAudio && !profile.SupportsAudio)
                     audioWarning = AppI18n.T("gifNoAudio");
+
+                if (effectiveSmartLoop)
+                    loopResult = await smartLoopProcessor.AnalyzeAndTrimAsync(
+                        tempVideo, outputPath, durationSeconds, cancellationToken);
             }
 
             return new CaptureOutcome(
@@ -155,7 +226,10 @@ internal sealed class CaptureService
                 AudioRequested: includeAudio,
                 AudioIncluded: audioIncluded,
                 AudioWarning: audioWarning,
-                BackgroundCapture: backgroundCapture,
+                BackgroundCapture: backgroundMode != "visible-fallback" && backgroundCapture,
+                BackgroundMode: backgroundMode,
+                BackgroundWarning: backgroundWarning,
+                SmartLoop: loopResult,
                 CleanReport: cleanReport,
                 CleanDetectedCount: selectedOverrides.Length);
         }
@@ -175,5 +249,8 @@ internal sealed record CaptureOutcome(
     bool AudioIncluded,
     string? AudioWarning,
     bool BackgroundCapture,
+    string BackgroundMode,
+    string? BackgroundWarning,
+    SmartLoopResult SmartLoop,
     WallpaperPropertiesApplyReport CleanReport,
     int CleanDetectedCount);

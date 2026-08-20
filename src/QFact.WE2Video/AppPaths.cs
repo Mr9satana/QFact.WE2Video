@@ -3,7 +3,7 @@ namespace QFact.WE2Video;
 internal static class AppPaths
 {
     public const string ProductName = "QFact.WE2Video";
-    public const string Version = "1.0.3";
+    public const string Version = "1.1.0-dev";
 
     public static string DataDirectory => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ProductName);

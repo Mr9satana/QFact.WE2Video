@@ -1,0 +1,46 @@
+name: v1.1 dev build
+
+on:
+  push:
+    branches: [v1.1.0-dev]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore complete source tree
+        shell: powershell
+        run: ./prepare_sources.ps1
+
+      - name: Build embedded UI bundle
+        shell: powershell
+        run: ./prepare_ui.ps1
+
+      - name: Publish v1.1 dev executable
+        shell: powershell
+        run: dotnet publish src/QFact.WE2Video/QFact.WE2Video.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=embedded -o dev-build/win-x64
+
+      - name: SHA-256
+        shell: powershell
+        run: |
+          $h=(Get-FileHash -Algorithm SHA256 dev-build/win-x64/QFact.WE2Video.exe).Hash.ToLower()
+          Set-Content -Encoding ASCII dev-build/SHA256SUMS.txt "$h  QFact.WE2Video.exe"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: QFact.WE2Video-v1.1.0-dev-win-x64
+          path: |
+            dev-build/win-x64/QFact.WE2Video.exe
+            dev-build/SHA256SUMS.txt
