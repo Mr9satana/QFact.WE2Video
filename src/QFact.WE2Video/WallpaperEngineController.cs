@@ -56,9 +56,9 @@ internal sealed class WallpaperEngineController
         psi.ArgumentList.Add("-height");
         psi.ArgumentList.Add(height.ToString());
         psi.ArgumentList.Add("-x");
-        psi.ArgumentList.Add(backgroundCapture ? "-32000" : "80");
+        psi.ArgumentList.Add(backgroundCapture ? "0" : "80");
         psi.ArgumentList.Add("-y");
-        psi.ArgumentList.Add(backgroundCapture ? "-32000" : "80");
+        psi.ArgumentList.Add(backgroundCapture ? "0" : "80");
         psi.ArgumentList.Add("-borderless");
         // Wallpaper Engine only brings a pop-out to foreground when -activate is requested.
         // Never pass it for background capture.
