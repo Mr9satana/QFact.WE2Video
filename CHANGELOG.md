@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.1.0 — 2026-08-21
+
+### Smart Loop
+- Added automatic Smart Loop analysis for Scene/Web exports from 2 to 300 seconds.
+- The capture records a small finite tail beyond the requested duration, downsamples frames for analysis, and compares short frame sequences around the requested endpoint.
+- The export duration is adjusted only when a sufficiently strong visual match is found; otherwise the exact requested duration is preserved.
+- Smart Loop trimming uses stream copy for normal video formats, avoiding an unnecessary second encode.
+
+### GIF reliability
+- Scene/Web GIF export no longer runs `palettegen/paletteuse` directly against a live Wallpaper Engine capture.
+- Scene/Web GIF now captures a finite temporary video first, closes the Wallpaper Engine pop-out immediately, and then encodes the GIF from the local file.
+- Direct Video → GIF uses the same finite two-stage approach instead of feeding an infinite loop into the GIF palette graph.
+- Added FFmpeg watchdog timeouts and process-tree cleanup so a stuck encode cannot wait forever.
+- Wallpaper Engine pop-outs are guaranteed to be closed during cleanup if capture or post-processing fails.
+
+### Version
+- Bumped application version to **1.1.0**.
+
 ## 1.0.3 — 2026-08-20
 
 - Fixed the developer support button: the WebView now sends the `openExternal` message correctly to the host application.
