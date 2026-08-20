@@ -27,7 +27,6 @@ internal sealed class CaptureService
         var smartLoopProcessor = new SmartLoopProcessor(ffmpegPath);
         var visualValidator = new CaptureVisualValidator(ffmpegPath);
         var caps = await ffmpeg.ProbeAsync();
-        // v1.1: Smart Loop is automatic for wallpaper-style exports >= 2 seconds.
         var effectiveSmartLoop = SmartLoopProcessor.IsEligible(durationSeconds);
         var captureDuration = effectiveSmartLoop
             ? SmartLoopProcessor.GetCaptureDuration(durationSeconds)
@@ -40,14 +39,14 @@ internal sealed class CaptureService
 
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
 
-        // Video wallpapers are already media files. Capturing a Wallpaper Engine pop-out adds a render generation,
-        // can return black frames on some systems, and throws away the original audio stream. Transcode directly.
+        // Video wallpapers are already media files. Capture a slightly longer working clip for Smart Loop,
+        // then trim to the best natural boundary near the requested duration.
         if (string.Equals(wallpaper.DisplayType, "video", StringComparison.OrdinalIgnoreCase))
         {
-            var tempDir = Path.Combine(Path.GetTempPath(), "QFact.WE2Video", Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(tempDir);
+            var directTempDir = Path.Combine(Path.GetTempPath(), "QFact.WE2Video", Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(directTempDir);
             var workingOutput = effectiveSmartLoop
-                ? Path.Combine(tempDir, "smart-loop" + profile.Extension)
+                ? Path.Combine(directTempDir, "smart-loop" + profile.Extension)
                 : outputPath;
             try
             {
@@ -55,9 +54,9 @@ internal sealed class CaptureService
                     wallpaper.LaunchPath, workingOutput, width, height, fps, captureDuration,
                     caps, profile, includeAudio && profile.SupportsAudio);
 
-                var loopResult = SmartLoopResult.Disabled(durationSeconds);
+                var directLoopResult = SmartLoopResult.Disabled(durationSeconds);
                 if (effectiveSmartLoop)
-                    loopResult = await smartLoopProcessor.AnalyzeAndTrimAsync(
+                    directLoopResult = await smartLoopProcessor.AnalyzeAndTrimAsync(
                         workingOutput, outputPath, durationSeconds, cancellationToken);
 
                 return new CaptureOutcome(
@@ -68,13 +67,13 @@ internal sealed class CaptureService
                     BackgroundCapture: true,
                     BackgroundMode: "direct-video",
                     BackgroundWarning: null,
-                    SmartLoop: loopResult,
+                    SmartLoop: directLoopResult,
                     CleanReport: WallpaperPropertiesApplyReport.Empty,
                     CleanDetectedCount: 0);
             }
             finally
             {
-                try { Directory.Delete(tempDir, recursive: true); } catch { }
+                try { Directory.Delete(directTempDir, recursive: true); } catch { }
             }
         }
 
