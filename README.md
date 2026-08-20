@@ -1,6 +1,6 @@
 # Wallpaper Engine to Video / MP4 / GIF Converter — QFact.WE2Video
 
-**QFact.WE2Video** is a free Windows utility for exporting installed **Wallpaper Engine** wallpapers to **MP4, WebM, MKV, MOV or GIF**. It supports **Scene, Video and Web wallpapers**, optional audio, background capture and manual Clean Export.
+**QFact.WE2Video** is a free Windows utility for exporting installed **Wallpaper Engine** wallpapers to **MP4, WebM, MKV, MOV or GIF**. It supports **Scene, Video and Web wallpapers**, optional audio, background capture, Smart Loop and manual Clean Export.
 
 **RU:** QFact.WE2Video — конвертер **Wallpaper Engine в видео / MP4 / GIF** для Windows. Программа позволяет сохранить установленные обои Wallpaper Engine в обычный видеофайл и использовать результат вне Wallpaper Engine.
 
@@ -20,6 +20,8 @@ No installer is required. The app is published as a self-contained `win-x64` exe
 
 - **Wallpaper Engine → video/GIF:** MP4/H.264, MP4/HEVC, WebM/VP9, MKV/H.264, MOV/H.264 and animated GIF.
 - **Scene / Web wallpapers:** rendered through Wallpaper Engine and captured with Windows Graphics Capture.
+- **Smart Loop:** for Scene/Web exports from 2 to 300 seconds, QFact.WE2Video records a short safety tail and compares frame sequences around the requested endpoint. The duration changes only when a strong visual match is found.
+- **Reliable GIF pipeline:** Scene/Web GIFs are encoded from a finite temporary capture after the Wallpaper Engine pop-out has already been closed; Video → GIF also uses a finite two-stage pipeline.
 - **Video wallpapers:** converted directly from the source media instead of recording a black pop-out window.
 - **Audio on/off:** source audio for Video; per-process WASAPI loopback for Scene/Web.
 - **Background capture:** the dedicated Wallpaper Engine render window is kept outside the normal desktop flow so you can keep working.
@@ -72,8 +74,11 @@ QFact.WE2Video is built for tasks such as:
 ### How do I export Wallpaper Engine wallpaper to video or MP4?
 Open QFact.WE2Video, select the installed wallpaper, choose MP4 · H.264 and the output settings, then click **Export**. Scene/Web wallpapers are rendered and captured; Video wallpapers are converted directly.
 
+### Что делает Smart Loop?
+Для Scene/Web-обоев QFact.WE2Video может записать небольшой запас после выбранной длительности и сравнить последовательности кадров возле точки обрезки. Если найдено достаточно хорошее совпадение с началом ролика, конечная точка аккуратно сдвигается; если уверенного совпадения нет, программа оставляет указанную длительность без изменений.
+
 ### Можно ли сделать GIF из Wallpaper Engine?
-Да. Выберите формат **GIF**. GIF не содержит звук, поэтому аудио отключается автоматически.
+Да. Выберите формат **GIF**. GIF не содержит звук, поэтому аудио отключается автоматически. Начиная с v1.1.0 GIF кодируется из конечного временного видео, поэтому Wallpaper Engine не остаётся висеть открытым на этапе построения палитры.
 
 ### Нужна ли обычная запись экрана?
 Нет. QFact.WE2Video uses Windows Graphics Capture for Scene/Web and direct FFmpeg conversion for Video wallpapers.
@@ -143,7 +148,7 @@ See **[SUPPORT.md](SUPPORT.md)**.
 
 ## Project status
 
-Current stable release: **v1.0.3**.
+Current stable release: **v1.1.0**.
 
 Bug reports and reproducible compatibility issues are welcome through GitHub Issues.
 
