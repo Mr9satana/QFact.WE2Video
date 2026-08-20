@@ -12,6 +12,8 @@
 
 **[Download the latest QFact.WE2Video.exe](https://github.com/Mr9satana/QFact.WE2Video/releases/latest)**
 
+**Project website / GitHub Pages:** https://mr9satana.github.io/QFact.WE2Video/
+
 No installer is required. The app is published as a self-contained `win-x64` executable. Wallpaper Engine and Microsoft Edge WebView2 Runtime are still required for the relevant features; FFmpeg/ffprobe must be available on PATH.
 
 ## What it does / Что умеет
@@ -51,7 +53,13 @@ QFact.WE2Video is built for tasks such as:
 - **как сделать видео из обоев WE**
 - **как конвертировать Wallpaper Engine в MP4**
 
-See the focused guide: **[Wallpaper Engine → video / MP4 / GIF](docs/wallpaper-engine-to-video.md)**.
+## Focused guides / Гайды
+
+- **[Wallpaper Engine → video / MP4 / GIF](docs/wallpaper-engine-to-video.md)** — общий сценарий экспорта.
+- **[Wallpaper Engine to MP4](docs/wallpaper-engine-to-mp4.md)** — MP4/H.264 и рекомендуемые настройки.
+- **[Wallpaper Engine to GIF](docs/wallpaper-engine-to-gif.md)** — экспорт коротких анимаций в GIF.
+- **[How to export Wallpaper Engine wallpapers](docs/how-to-export-wallpaper-engine.md)** — пошаговый workflow и troubleshooting.
+- **[Как сохранить обои Wallpaper Engine в видео](docs/ru-kak-sohranit-wallpaper-engine-v-video.md)** — русская инструкция.
 
 ## FAQ
 
