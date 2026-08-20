@@ -197,7 +197,7 @@ internal static class WindowFinder
     private static IntPtr GetWindowLongPtr(IntPtr hwnd, int index)
         => IntPtr.Size == 8 ? GetWindowLongPtr64(hwnd, index) : new IntPtr(GetWindowLong32(hwnd, index));
     private static IntPtr SetWindowLongPtr(IntPtr hwnd, int index, IntPtr value)
-        => IntPtr.Size == 8 ? SetWindowLongPtr64(hwnd, index) : new IntPtr(SetWindowLong32(hwnd, index, value.ToInt32()));
+        => IntPtr.Size == 8 ? SetWindowLongPtr64(hwnd, index, value) : new IntPtr(SetWindowLong32(hwnd, index, value.ToInt32()));
 
     private sealed class BackgroundWindowGuard : IDisposable
     {
