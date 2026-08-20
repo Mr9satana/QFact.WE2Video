@@ -37,6 +37,23 @@
 - Record Wallpaper Engine wallpaper with or without audio.
 - Export wallpaper while hiding optional clock, media-player or visualizer modules exposed by the author.
 
+## FAQ / Поиск по частым запросам
+
+### Как сохранить обои Wallpaper Engine в видео?
+Выберите Scene, Web или Video-обои в QFact.WE2Video, задайте MP4 · H.264, разрешение, FPS и длительность, затем нажмите **Экспортировать**. Scene/Web будут отрендерены через Wallpaper Engine, а Video-конвертированы напрямую из исходного файла.
+
+### Как конвертировать Wallpaper Engine в MP4?
+QFact.WE2Video — Windows-конвертер **Wallpaper Engine → MP4**. Для максимальной совместимости используйте MP4 · H.264.
+
+### How do I export Wallpaper Engine wallpaper to video or MP4?
+Open QFact.WE2Video, select the installed wallpaper, choose MP4 · H.264 and the output settings, then click **Export**. Scene/Web wallpapers are rendered and captured; Video wallpapers are converted directly.
+
+### Можно ли сделать GIF из Wallpaper Engine?
+Да. Выберите формат GIF. GIF не содержит звук, поэтому аудио для него отключается автоматически.
+
+### Нужна ли запись экрана?
+Нет. QFact.WE2Video использует отдельный pipeline: Windows Graphics Capture для Scene/Web и прямое FFmpeg-конвертирование для Video wallpapers.
+
 ## Requirements
 
 Runtime:
@@ -76,9 +93,11 @@ Default exports: `%USERPROFILE%\Videos\QFact.WE2Video\Exports`.
 
 ## Support the project / Поддержать разработку
 
-If QFact.WE2Video saved you time, you can support the project here: https://dalink.to/daewri
+If QFact.WE2Video saved you time, you can support development here: **[DaLink — daewri](https://dalink.to/daewri)**.
 
-Если программа оказалась полезной, поддержать разработку можно здесь: https://dalink.to/daewri
+Если программа оказалась полезной, поддержать разработку можно здесь: **[DaLink — daewri](https://dalink.to/daewri)**.
+
+The same support destination is used by the built-in Help/About section. See also **[SUPPORT.md](SUPPORT.md)**.
 
 ## Third-party / Disclaimer
 
