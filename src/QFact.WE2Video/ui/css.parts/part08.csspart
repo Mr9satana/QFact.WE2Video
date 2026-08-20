@@ -1,0 +1,27 @@
+ound:rgba(255,255,255,.03);color:#b9afc9;font-size:21px;line-height:1;cursor:pointer}.help-close:hover{border-color:rgba(181,153,255,.38);background:rgba(166,137,245,.09);color:#fff}
+.help-body{min-height:0;overflow:auto;padding:18px 26px 22px;scrollbar-width:thin;scrollbar-color:rgba(171,143,247,.30) transparent}.help-body::-webkit-scrollbar{width:6px}.help-body::-webkit-scrollbar-thumb{border-radius:999px;background:rgba(171,143,247,.30)}
+.help-quick{padding:14px 16px;border:1px solid rgba(181,153,255,.13);border-radius:14px;background:linear-gradient(115deg,rgba(128,96,233,.12),rgba(255,255,255,.025))}.help-quick strong{display:block;margin-bottom:4px;color:#ece5ff;font-size:11px}.help-quick p{margin:0;color:#9e93af;font-size:10px;line-height:1.55}
+.help-grid{margin-top:13px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.help-section{min-width:0;padding:13px 14px;display:grid;grid-template-columns:27px minmax(0,1fr);gap:10px;border:1px solid rgba(225,216,255,.07);border-radius:13px;background:rgba(255,255,255,.018)}
+.help-step{width:27px;height:27px;display:grid;place-items:center;border-radius:9px;background:linear-gradient(135deg,rgba(117,86,223,.62),rgba(164,135,243,.50));color:#fff;font-size:9px;font-weight:850;box-shadow:0 5px 14px rgba(94,57,192,.13)}
+.help-section h3{margin:1px 0 4px;color:#eee8fb;font-size:10.5px}.help-section p{margin:0;color:#857a93;font-size:9px;line-height:1.52}
+.help-notes{margin-top:13px;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid rgba(225,216,255,.07);border-radius:14px;background:rgba(255,255,255,.014);overflow:hidden}.help-notes>div{padding:13px 14px}.help-notes>div+div{border-left:1px solid rgba(225,216,255,.065)}.help-notes strong{display:block;margin-bottom:4px;color:#dcd3ee;font-size:9.5px}.help-notes p{margin:0;color:#786e86;font-size:8.5px;line-height:1.52}
+.help-trouble{margin-top:13px;padding:13px 14px;border-left:2px solid rgba(169,139,255,.46);background:rgba(128,96,233,.035);border-radius:0 11px 11px 0}.help-trouble h3{margin:0 0 4px;color:#dcd3ee;font-size:9.5px}.help-trouble p{margin:0;color:#81768e;font-size:8.7px;line-height:1.52}
+.help-footer{padding:13px 18px 13px 26px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-top:1px solid rgba(225,216,255,.08);background:rgba(255,255,255,.012)}.help-footer span{color:#6f667c;font-size:8.5px}.primary-help{height:34px;padding:0 16px;border:0;border-radius:10px;background:linear-gradient(135deg,#7556df,#a487f3);box-shadow:0 7px 17px rgba(104,67,210,.24);color:#fff;font-size:9px;font-weight:760;cursor:pointer}.primary-help:hover{filter:brightness(1.06);transform:translateY(-1px)}
+@media(max-width:900px){.help-grid{grid-template-columns:1fr}.help-notes{grid-template-columns:1fr}.help-notes>div+div{border-left:0;border-top:1px solid rgba(225,216,255,.065)}}
+
+
+.help-footer-actions{display:flex;align-items:center;gap:8px}.support-help{height:34px;padding:0 14px;border:1px solid rgba(181,153,255,.24);border-radius:10px;background:rgba(166,137,245,.08);color:#d9ceff;font-size:9px;font-weight:720;cursor:pointer}.support-help:hover{border-color:rgba(181,153,255,.5);background:rgba(166,137,245,.14);transform:translateY(-1px)}
+
+/* QFact.WE2Video 1.0.3 — always-visible developer support CTA in the header. */
+.support-header-button{
+  height:34px;min-width:174px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:1px solid rgba(181,153,255,.30);border-radius:10px;
+  background:linear-gradient(135deg,rgba(117,86,223,.30),rgba(164,135,243,.16));
+  color:#eee7ff;font-size:9.5px;font-weight:780;white-space:nowrap;cursor:pointer;
+  box-shadow:0 7px 18px rgba(91,57,192,.13),inset 0 1px rgba(255,255,255,.06);
+  transition:transform .14s var(--ease),border-color .14s var(--ease),background .14s var(--ease),box-shadow .14s var(--ease);
+}
+.support-header-button svg{width:14px;height:14px;fill:none;stroke:#d9cbff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 2px 5px rgba(128,96,233,.25))}
+.support-header-button:hover{transform:translateY(-1px);border-color:rgba(196,173,255,.55);background:linear-gradient(135deg,rgba(117,86,223,.46),rgba(164,135,243,.24));box-shadow:0 9px 22px rgba(91,57,192,.19),inset 0 1px rgba(255,255,255,.08)}
+.support-header-button:active{transform:translateY(0)}
+@media(max-width:1420px){.support-header-button{min-width:38px;width:38px;padding:0}.support-header-button span{display:none}.support-header-button svg{width:15px;height:15px}}

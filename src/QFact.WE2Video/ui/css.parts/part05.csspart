@@ -1,0 +1,27 @@
+,52,.95),rgba(13,10,25,.93));box-shadow:0 22px 56px rgba(2,1,8,.46);backdrop-filter:blur(24px);display:grid;grid-template-columns:8px minmax(0,1fr);gap:10px;align-items:center;opacity:0;pointer-events:none;transform:translateY(10px) scale(.985);transition:.2s var(--ease)}.toast.show{opacity:1;transform:none}.toast-dot{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 12px rgba(78,210,139,.6)}.toast.error .toast-dot{background:var(--danger);box-shadow:0 0 12px rgba(255,102,140,.55)}.toast.warning .toast-dot{background:var(--warning);box-shadow:0 0 12px rgba(240,189,106,.5)}.toast>div:last-child{min-width:0;display:grid;gap:2px}.toast strong{font-size:9px}.toast span{color:var(--muted);font-size:8px;line-height:1.35}
+body.busy .library-panel{opacity:.80;pointer-events:none}
+
+.skeleton-list{display:grid;gap:6px}.skeleton-list div{height:76px;border-radius:12px;background:linear-gradient(90deg,rgba(255,255,255,.018),rgba(255,255,255,.045),rgba(255,255,255,.018));background-size:200% 100%;animation:shimmer 1.2s infinite}@keyframes shimmer{to{background-position:-200% 0}}
+@media(max-width:1180px){.main-grid{grid-template-columns:280px minmax(0,1fr)}.export-controls{grid-template-columns:1fr 1fr 92px 118px}.export-bottom{grid-template-columns:minmax(0,1fr) 260px}.brand-copy span{display:none}.format-description{display:none}}
+
+/* 1.0.0 — compact capture options. Replaces the preset workflow. */
+.capture-options{margin-top:9px;display:grid;grid-template-columns:.82fr 1.14fr 1.5fr;border:1px solid rgba(211,198,255,.085);border-radius:13px;background:linear-gradient(115deg,rgba(128,96,233,.045),rgba(255,255,255,.012));backdrop-filter:blur(22px) saturate(120%);overflow:hidden}
+.capture-option{min-width:0;min-height:58px;padding:9px 10px;display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:9px;align-items:center;position:relative}
+.capture-option+.capture-option{border-left:1px solid rgba(224,214,255,.055)}
+.capture-option-icon{width:28px;height:28px;display:grid;place-items:center;border:1px solid rgba(179,149,250,.13);border-radius:9px;background:linear-gradient(145deg,rgba(128,96,233,.12),rgba(255,255,255,.025));color:#d1c2ff;font-size:13px;box-shadow:inset 0 1px rgba(255,255,255,.04)}
+.capture-option-copy{min-width:0;display:grid;gap:2px}.capture-option-copy strong{font-size:9.5px;color:#f5f0ff}.capture-option-copy>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#746a82;font-size:7.4px}
+.clean-title{display:flex;align-items:center;gap:6px;min-width:0}.clean-count{padding:2px 5px;border-radius:999px;background:rgba(255,255,255,.035);color:#746a82;font-size:6.9px;font-weight:750}.clean-count.active{background:rgba(144,108,235,.12);color:#cdbbff}
+.clean-details{grid-column:2/4;min-width:0;margin-top:-2px}.clean-details summary{width:max-content;color:#776c88;font-size:7px;cursor:pointer;user-select:none;list-style:none}.clean-details summary::-webkit-details-marker{display:none}.clean-details summary::after{content:' ›';color:#a68bec}.clean-details[open] summary::after{content:' ↓'}
+.clean-items{margin-top:6px;max-height:92px;overflow:auto;display:grid;gap:3px;padding-right:3px}.clean-items>span{color:#675e73;font-size:7px;line-height:1.4}.clean-item{display:grid;grid-template-columns:7px minmax(0,1fr) auto;align-items:center;gap:6px;padding:4px 6px;border-radius:7px;background:rgba(255,255,255,.022);color:#aea2c4;font-size:7.2px}.clean-item i{width:5px;height:5px;border-radius:50%;background:#a98bff;box-shadow:0 0 7px rgba(169,139,255,.35)}.clean-item i.audio{background:#78c6e7}.clean-item small{max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#655c72;font-size:6.6px}
+.switch input:disabled+span{opacity:.35;cursor:not-allowed}
+@media(max-width:1180px){.capture-options{grid-template-columns:1fr 1fr}.clean-option{grid-column:1/-1;border-left:0!important;border-top:1px solid rgba(224,214,255,.055)}}
+
+/* 1.0.0 — manual Clean Export + larger desktop workspace. */
+.path-button{height:31px;max-width:180px;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03);color:#9e93af;display:flex;align-items:center;gap:7px;cursor:pointer;transition:.15s var(--ease)}
+.path-button:hover{border-color:rgba(185,158,255,.35);background:rgba(164,132,246,.08);color:#d7ccf2}
+.path-button.active{border-color:rgba(78,210,139,.17);background:rgba(78,210,139,.055);color:#baf2d4}
+.path-button svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.path-button span{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:9px;font-weight:700}
+
+.main-grid{grid-template-columns:340px minmax(0,1fr)}
+.library-panel{padding-inline:

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>QFact.WE2Video</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+  <div class="ambient ambient-c"></div>
+
+  <div class="app-shell">
+    <header class="topbar glass">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><img src="assets/qfact-logo.png" alt=""></div>
+        <div class="brand-copy">
+          <strong>QFact.WE2Video</strong>
+          <span>Wallpaper Engine Export Studio</span>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button id="supportHeaderButton" class="support-header-button" type="button" data-i18n-title="supportDeveloper">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"/></svg>
+          <span data-i18n="supportDeveloper">Поддержать разработчика</span>
+        </button>
+        <div id="engineStatus" class="engine-status pending"><i></i><span data-i18n="checkingFfmpeg">Проверка FFmpeg…</span></div>
+        <button id="enginePathButton" class="path-button" type="button" data-i18n-title="enginePathTitle">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h6l2 2h10v10H3z"/><path d="M8 12h8"/></svg>
+          <span id="enginePathLabel">Steam / WE</span>
+        </button>
+        <button id="clearEnginePathButton" class="icon-button hidden" type="button" data-i18n-title="enginePathReset" data-i18n-aria="enginePathReset">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <button id="languageButton" class="language-button" type="button" title="Language / Язык">RU</button>
+        <button id="helpButton" class="help-button" type="button" data-i18n-title="helpTitle" data-i18n-aria="helpTitle">?</button>
+        <button id="refreshButton" class="icon-button" type="button" data-i18n-title="refreshLibrary" data-i18n-aria="refreshLibrary">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.34 5.66M20 4v7h-7"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="main-grid">
+      <aside class="library-panel glass">
+        <div class="section-head">
+          <div><span class="eyebrow">WALLPAPER ENGINE</span><h2 data-i18n="library">Библиотека</h2></div>
+          <span id="libraryCount" class="count-pill">0</span>
+        </div>
+
+        <label class="search-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="searchInput" type="search" data-i18n-placeholder="searchWallpapers" placeholder="Поиск обоев…" autocomplete="off">
+          <kbd>Ctrl K</kbd>
+        </label>
+
+        <div class="library-tools">
+          <div id="filterChips" class="filter-chips" role="tablist" data-i18n-aria="wallpaperType">
+            <button class="filter-chip active" data-filter="All" type="button" data-i18n="all">Все</button>
+            <button class="filter-chip" data-filter="Scene" type="button">Scene</button>
+            <button class="filter-chip" data-filter="Video" type="button">Video</button>
+            <button class="filter-chip" data-filter="Web" type="button">Web</button>
+            <button class="filter-chip" data-filter="Application" type="button">App</button>
+          </div>
+          <label class="sort-control" data-i18n-title="sorting">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h8M8 18h4M4 5v14"/></svg>
+            <select id="sortSelect" data-i18n-aria="librarySorting">
+              <option value="name" data-i18n="sortName">Имя A–Z</option>
+              <option value="recent" data-i18n="sortRecent">Недавно обновлённые</option>
+              <option value="type" data-i18n="sortType">Тип</option>
+              <option value="source" data-i18n="sortSource">Источник</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="wallpaperList" class="wallpaper-list" role="listbox" data-i18n-aria="installedWallpapers">
+          <div class="skeleton-list"><div></div><div></div><div></div><div></div><div></div></div>
+        </div>
+        <div class="library-footer"><span id="libraryFooterText" data-i18n="scanning">Сканирование…</span><span class="mini-dot"></span></div>
+      </aside>
+
+      <section class="workspace">
+        <article class="preview-card glass">
+          <div class="preview-toolbar">
+            <div class="preview-badges"><span id="typeBadge" class="badge accent">—</span><span id="sourceBadge" class="badge">—</span><span id="workshopBadge" class="badge subtle hidden">Workshop</span></div>
+            <button id="openWallpaperFolder" class="text-button" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h6l2 2h10v10H3z"/></svg>
+              <span data-i18n="projectFolder">Папка проекта</span>
+            </button>
+          </div>
+
+          <div id="previewStage" class="preview-stage">
+            <div id="previewBackdrop" class="preview-backdrop"></div><div class="preview-shade"></div>
+            <img id="previewImage" alt="Wallpaper Engine preview">
+            <div id="previewEmpty" class="preview-empty"><img src="assets/qfact-logo.png" alt=""><span data-i18n="chooseWallpaperLibrary">Выберите обои в библиотеке</span></div>
+          </div>
+
+          <div class="wallpaper-summary">
+            <div class="title-row">
+              <div class="title-block"><h1 id="wallpaperTitle" data-i18n="chooseWallpaper">Выберите обои</h1><p id="wallpaperSubtitle" data-i18n="metadataWillAppear">Метаданные и параметры экспорта появятся здесь.</p></div>
+              <div id="resolutionHero" class="resolution-hero"><span data-i18n="nativeShort">Исходное</span><strong>—</strong></div>
+            </div>
+            <div class="meta-strip">
+              <div class="meta-cell"><span data-i18n="resolution">Разрешение</span><strong id="metricResolution">—</strong><small id="metricResolutionSource">—</small></div>
+              <div class="meta-cell"><span data-i18n="music">Музыка</span><strong id="metricMusic">—</strong><small id="metricVideoDuration">—</small></div>
+              <div class="meta-cell meta-workshop"><span>Workshop</span><strong id="metricWorkshop">—</strong><small id="metricAuthor">—</small></div>
+            </div>
+            <div id="tagRow" class="tag-row"></div><p id="metadataNote" class="metadata-note hidden"></p>
+          </div>
+        </article>
+
+        <section class="export-card glass">
+          <div class="export-head"><div><span class="eyebrow">OUTPUT</span><h2 data-i18n="export">Экспорт</h2></div><div id="formatDescription" class="format-description">MP4 · H.264</div></div>
+
+          <div class="export-controls">
+            <label class="field field-format"><span data-i18n="format">Формат</span><select id="formatSelect"></select><small id="formatCodec">H.264 / AVC</small></label>
+            <label class="field field-resolution"><span data-i18n="resolution">Разрешение</span><select id="resolutionSelect"></select><small id="resolutionHint">1920 × 1080</small></label>
+            <label class="field compact-field"><span>FPS</span><input id="fpsInput" type="number" min="1" max="240" value="60" inputmode="numeric"><small data-i18n="framesPerSecond">кадров/с</small></label>
+            <label class="field compact-field"><span data-i18n="duration">Длительность</span><div class="suffix-input"><input id="durationInput" type="number" min="0.1" max="86400" step="0.5" value="10"><em data-i18n="sec">сек</em></div><small data-i18n="recordingTime">время записи</small></label>
+          </div>
+
+          <div id="customResolution" class="custom-resolution hidden">
+            <label class="field"><span data-i18n="width">Ширина</span><input id="widthInput" type="number" min="64" max="16384" value="1920"></label>
+            <span class="dimension-x">×</span>
+            <label class="field"><span data-i18n="height">Высота</span><input id="heightInput" type="number" min="64" max="16384" value="1080"></label>
+          </div>
+
+          <div class="capture-options glass-subtle">
+            <div class="capture-option"><div class="capture-option-icon">♪</div><div class="capture-option-copy"><strong data-i18n="audio">Звук</strong><span id="audioHint" data-i18n="wallpaperOriginalAudio">Оригинальный звук обоев</span></div><label class="switch" data-i18n-title="recordAudio"><input id="audioToggle" type="checkbox" checked><span></span></label></div>
+            <div class="capture-option"><div class="capture-option-icon">◌</div><div class="capture-option-copy"><strong data-i18n="backgroundCapture">Фоновый захват</strong><span data-i18n="backgroundCaptureHint">Окно Wallpaper Engine не мешает работе</span></div><label class="switch" data-i18n-title="renderInBackground"><input id="backgroundCaptureToggle" type="checkbox" checked><span></span></label></div>
+          </div>
+
+          <section id="manualCleanPanel" class="manual-clean glass-subtle">
+            <div class="manual-clean-head">
+              <div class="manual-clean-title"><div class="capture-option-icon">✦</div><div>
+                <div class="manual-clean-title-line"><strong data-i18n="cleanExportManual">Clean Export · вручную</strong><span id="cleanCount" class="clean-count">0</span><span id="cleanSelectedCount" class="clean-selected-count">0</span></div>
+                <p id="cleanHint" data-i18n="cleanIntro">QFact.WE2Video покажет доступные корневые переключатели этих обоев. Выбери, что отключить перед записью.</p>
+              </div></div>
+              <div class="manual-clean-actions"><button id="cleanSelectAll" type="button" data-i18n="selectAll">Выбрать все</button><button id="cleanClearAll" type="button" class="ghost" data-i18n="clearAll">Снять всё</button></div>
+            </div>
+            <div id="cleanItems" class="manual-clean-grid"><div class="clean-empty" data-i18n="cleanChooseScene">Выбери Scene/Web-обои, чтобы увидеть их переключатели.</div></div>
+          </section>
+
+          <div class="export-bottom">
+            <div class="folder-control"><span class="folder-label" data-i18n="folder">Папка</span><div class="folder-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h6l2 2h10v10H3z"/></svg><span id="outputFolderText">exports</span></div><button id="browseFolder" class="mini-button" type="button" data-i18n="change">Изменить</button><button id="openFolder" class="mini-button ghost" type="button" data-i18n="open">Открыть</button></div>
+            <button id="exportButton" class="export-button" type="button" disabled><span class="export-button-copy"><strong data-i18n="exportVerb">Экспортировать</strong><small id="exportButtonMeta">MP4 · 1080p · 60 FPS</small></span><span class="export-arrow">→</span><span class="export-progress"></span></button>
+          </div>
+          <div id="lastExport" class="last-export hidden"><div><span data-i18n="lastExport">Последний экспорт</span><strong id="lastExportText" data-i18n="done">Готово</strong></div><button id="openLastExport" type="button" data-i18n="showFile">Показать файл</button></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="languageGate" class="language-gate hidden" role="dialog" aria-modal="true" aria-labelledby="languageGateTitle">
+    <div class="language-gate-card glass">
+      <div class="language-logo"><img src="assets/qfact-logo.png" alt=""></div>
+      <span class="eyebrow">QFACT.WE2VIDEO · 1.0.3</span>
+      <h2 id="languageGateTitle">Choose interface language</h2>
+      <p>Выберите язык интерфейса · Choose your interface language</p>
+      <div class="language-choices"><button type="button" data-language="ru"><strong>Русский</strong><span>Продолжить на русском</span></button><button type="button" data-language="en"><strong>English</strong><span>Continue in English</span></button></div>
+    </div>
+  </div>
+
+  <div id="helpModal" class="help-modal hidden" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
+    <div class="help-dialog glass">
+      <div class="help-header">
+        <div>
+          <span class="eyebrow">QFACT.WE2VIDEO</span>
+          <h2 id="helpModalTitle" data-i18n="helpHeading">Как пользоваться</h2>
+          <p data-i18n="helpIntro">Если коротко: выбери обои, настрой результат и нажми «Экспортировать». Остальное приложение сделает само.</p>
+        </div>
+        <button id="helpCloseButton" class="help-close" type="button" data-i18n-title="close" data-i18n-aria="close">×</button>
+      </div>
+
+      <div class="help-body">
+        <section class="help-quick glass-subtle">
+          <strong data-i18n="helpQuickTitle">Самый быстрый вариант</strong>
+          <p data-i18n="helpQuickText">Нужен обычный ролик? Выбери обои → оставь MP4 · H.264 → выбери 1080p или 2K → при необходимости оставь звук → нажми «Экспортировать». Всё.</p>
+        </section>
+
+        <div class="help-grid">
+          <section class="help-section">
+            <span class="help-step">1</span>
+            <div><h3 data-i18n="helpStep1Title">Выбери обои</h3><p data-i18n="helpStep1Text">Слева находится вся найденная библиотека Wallpaper Engine. Scene и Web рендерятся через Wallpaper Engine, а Video конвертируется напрямую из исходного видеофайла.</p></div>
+          </section>
+          <section class="help-section">
+            <span class="help-step">2</span>
+            <div><h3 data-i18n="helpStep2Title">Настрой экспорт</h3><p data-i18n="helpStep2Text">MP4 · H.264 — лучший вариант по умолчанию. Выбери разрешение, FPS и длительность. «Исходное» использует размер, который удалось определить у обоев.</p></div>
+          </section>
+          <section class="help-section">
+            <span class="help-step">3</span>
+            <div><h3 data-i18n="helpStep3Title">Звук и фон</h3><p data-i18n="helpStep3Text">«Звук» добавляет аудио обоев. «Фоновый захват» позволяет продолжать пользоваться компьютером во время Scene/Web-записи — окно рендера не должно мешать работе.</p></div>
+          </section>
+          <section class="help-section">
+            <span class="help-step">4</span>
+            <div><h3 data-i18n="helpStep4Title">Clean Export</h3><p data-i18n="helpStep4Text">Для Scene/Web можно вручную выбрать переключатели, которые нужно выключить только на время записи: часы, медиаплеер, персонажа, эффекты и любые другие доступные автором настройки. У модулей внутренние подпункты скрыты и обрабатываются автоматически.</p></div>
+          </section>
+          <section class="help-section">
+            <span class="help-step">5</span>
+            <div><h3 data-i18n="helpStep5Title">Экспортируй</h3><p data-i18n="helpStep5Text">Нажми «Экспортировать» и дождись уведомления. Готовый файл появится в выбранной папке. После завершения его можно сразу показать в Проводнике.</p></div>
+          </section>
+          <section class="help-section">
+            <span class="help-step">6</span>
+            <div><h3 data-i18n="helpStep6Title">Если Steam не найден</h3><p data-i18n="helpStep6Text">Нажми кнопку «Steam / WE» сверху и укажи Steam, SteamLibrary, steamapps или саму папку wallpaper_engine. Программа запомнит путь.</p></div>
+          </section>
+        </div>
+
+        <section class="help-notes glass-subtle">
+          <div><strong data-i18n="helpFormatsTitle">Какой формат выбрать?</strong><p data-i18n="helpFormatsText">MP4 · H.264 — почти всегда. HEVC — если важен меньший размер. WebM · VP9 — для веба. GIF — короткая анимация без звука. MKV/MOV — когда этого требует дальнейшая работа.</p></div>
+          <div><strong data-i18n="helpCleanNoteTitle">Важно про Clean Export</strong><p data-i18n="helpCleanNoteText">QFact.WE2Video показывает только те переключатели, которые реально опубликованы автором обоев. Если нужного элемента в списке нет, приложение не может безопасно выключить его без изменения самого проекта.</p></div>
+          <div><strong data-i18n="helpSafetyTitle">Оригиналы в безопасности</strong><p data-i18n="helpSafetyText">Программа не переписывает Workshop-проекты. Экспорт и временные настройки выполняются отдельно от оригинальных файлов Wallpaper Engine.</p></div>
+        </section>
+
+        <section class="help-trouble">
+          <h3 data-i18n="helpTroubleTitle">Если что-то не работает</h3>
+          <p data-i18n="helpTroubleText">Сначала нажми обновление библиотеки. Если Wallpaper Engine не найден — укажи путь вручную. Если не работает конкретный формат или звук — запусти doctor.bat из Release Kit и проверь FFmpeg. Для звука Scene/Web нужна Windows 10 2004 или новее.</p>
+        </section>
+      </div>
+
+      <div class="help-footer"><span data-i18n="helpFooter">QFact.WE2Video · Сделано так, чтобы один раз настроить и дальше просто экспортировать.</span><div class="help-footer-actions"><button id="supportDeveloperButton" type="button" class="support-help" data-i18n="supportDeveloper">Поддержать разработчика</button><button id="helpGotItButton" type="button" class="primary-help" data-i18n="gotIt">Понятно</button></div></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"><div class="toast-dot"></div><div><strong id="toastTitle" data-i18n="done">Готово</strong><span id="toastMessage"></span></div></div>
+  <script src="app.js"></script>
+</body>
+</html>
