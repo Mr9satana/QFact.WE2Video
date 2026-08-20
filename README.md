@@ -148,7 +148,7 @@ See **[SUPPORT.md](SUPPORT.md)**.
 
 ## Project status
 
-Current stable release: **v1.1.0**.
+Current stable release: **v1.0.3**. **v1.1.0** (Smart Loop + GIF reliability) is built and undergoing runtime smoke testing before release.
 
 Bug reports and reproducible compatibility issues are welcome through GitHub Issues.
 
