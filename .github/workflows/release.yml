@@ -2,8 +2,14 @@ name: release
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (for example v1.0.4)'
+        required: true
+        default: 'v1.0.3'
   push:
-    branches: [main]
+    tags:
+      - 'v*'
 
 permissions:
   contents: write
@@ -39,17 +45,27 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: QFact.WE2Video-v1.0.3-win-x64
+          name: QFact.WE2Video-win-x64
           path: |
             release/win-x64/QFact.WE2Video.exe
             release/SHA256SUMS.txt
 
-      - name: Publish GitHub Release v1.0.3
+      - name: Resolve release tag
+        id: release_tag
+        shell: powershell
+        run: |
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+            "tag=${{ inputs.tag }}" >> $env:GITHUB_OUTPUT
+          } else {
+            "tag=${{ github.ref_name }}" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.3
-          target_commitish: main
-          name: QFact.WE2Video v1.0.3
+          tag_name: ${{ steps.release_tag.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: QFact.WE2Video ${{ steps.release_tag.outputs.tag }}
           body_path: RELEASE_NOTES.md
           files: |
             release/win-x64/QFact.WE2Video.exe
