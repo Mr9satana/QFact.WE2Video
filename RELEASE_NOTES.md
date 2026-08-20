@@ -20,3 +20,5 @@ First public stable release of QFact.WE2Video.
 Windows 10 2004+ or Windows 11. Wallpaper Engine is required for Scene/Web wallpapers. FFmpeg/ffprobe and Microsoft Edge WebView2 Runtime are required at runtime.
 
 QFact.WE2Video is independent software and is not affiliated with Wallpaper Engine, Valve or Steam.
+
+Release channel: stable.
